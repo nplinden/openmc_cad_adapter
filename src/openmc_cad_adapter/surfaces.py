@@ -214,7 +214,7 @@ class CADCylinder(CADSurface, openmc.Cylinder):
                     )
                     wid = emit_get_last_id(ent_type, cad_cmds)
             else:
-                cad_cmds.append(f"brick x {w[0]} y {w[1]} z {w[2]}")
+                cad_cmds.append(f"brick x {extents[0]} y {extents[1]} z {extents[2]}")
                 wid = emit_get_last_id(ent_type, cad_cmds)
             cad_cmds.append(f"subtract body {{ { ids } }} from body {{ { wid } }}")
             rotate(wid, self.dx, self.dy, self.dz, cad_cmds)
