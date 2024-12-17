@@ -122,12 +122,6 @@ def characterize_general_quadratic(surface):  # s surface
     A_ = eigenvalues[0]
     B_ = eigenvalues[1]
     C_ = eigenvalues[2]
-    D_ = 0
-    E_ = 0
-    F_ = 0
-    G_ = 0
-    H_ = 0
-    J_ = 0
     # alter type and coefficients for special cases
     # where coefficients are near-zero
     if gq_type == ONE_SHEET_HYPERBOLOID:

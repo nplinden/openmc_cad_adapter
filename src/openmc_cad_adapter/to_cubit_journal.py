@@ -13,17 +13,18 @@ try:
 except ImportError as e:
     raise type(e)("Please install OpenMC's Python API to use the CAD conversion tool")
 
-from openmc.region import Region, Complement, Intersection, Union
+from openmc.region import Complement, Intersection, Union
 from openmc.surface import Halfspace, Quadric
 from openmc.lattice import Lattice, HexLattice
 
-from .gqs import *
+import openmc_cad_adapter.gqs as gqs
+from openmc_cad_adapter.gqs import CADPlane, CADCylinder, CADSphere
+from openmc_cad_adapter.gqs import CADXPlane, CADYPlane, CADZPlane
+from openmc_cad_adapter.gqs import CADXCylinder, CADYCylinder, CADZCylinder
+from openmc_cad_adapter.gqs import CADXCone, CADYCone, CADZCone
+from openmc_cad_adapter.gqs import CADXTorus, CADYTorus, CADZTorus
 from .cubit_util import emit_get_last_id, reset_cubit_ids, new_variable
-from .geom_util import rotate, move
-from .cubit_util import emit_get_last_id, reset_cubit_ids, new_variable
-from .geom_util import rotate, move
-from .cubit_util import emit_get_last_id, reset_cubit_ids, new_variable
-from .geom_util import rotate, move
+from .geom_util import move
 
 from .surfaces import _CAD_SURFACE_DICTIONARY
 
@@ -146,7 +147,7 @@ def to_cubit_journal(
                 return ids
             elif surface._type == "quadric":
                 (gq_type, A_, B_, C_, K_, translation, rotation_matrix) = (
-                    characterize_general_quadratic(surface)
+                    gqs.characterize_general_quadratic(surface)
                 )
 
                 def rotation_to_axis_angle(mat):
@@ -183,11 +184,11 @@ def to_cubit_journal(
                 # compensate for cubits insertion of a negative
                 r_degs = -math.degrees(r_theta)
                 print(r_axis, math.degrees(r_theta), r_degs)
-                if gq_type == ELLIPSOID:  # 1
+                if gq_type == gqs.ELLIPSOID:  # 1
                     r1 = math.sqrt(abs(-K_ / A_))
                     r2 = math.sqrt(abs(-K_ / B_))
                     r3 = math.sqrt(abs(-K_ / C_))
-                    cmds.append(f"sphere radius 1")
+                    cmds.append("sphere radius 1")
                     ids = emit_get_last_id(ent_type, cmds)
                     cmds.append(f"body {{ { ids } }} scale x { r1 } y { r2 } z { r3 }")
                     move(
@@ -197,7 +198,7 @@ def to_cubit_journal(
                         translation[2, 0],
                         cmds,
                     )
-                elif gq_type == ELLIPTIC_CYLINDER:  # 7
+                elif gq_type == gqs.ELLIPTIC_CYLINDER:  # 7
                     if A_ == 0:
                         print("X", gq_type, A_, B_, C_, K_, r_axis, r_degs)
                         h = inner_world[0] if inner_world else w[0]
@@ -368,13 +369,11 @@ def to_cubit_journal(
                             cmds,
                         )
                         return ids
-                elif gq_type == ELLIPTIC_CONE:  # 3
+                elif gq_type == gqs.ELLIPTIC_CONE:  # 3
                     if A_ == 0:
                         h = inner_world[0] if inner_world else w[0]
                         minor = math.sqrt(abs(-A_ / C_))
                         major = math.sqrt(abs(-A_ / B_))
-                        rot_angle = -90
-                        rot_axis = 1
                         cmds.append(
                             f"create frustum height {h} Major Radius {major} Minor Radius {minor} top 0"
                         )
@@ -401,8 +400,6 @@ def to_cubit_journal(
                         h = inner_world[1] if inner_world else w[1]
                         minor = math.sqrt(abs(-B_ / A_))
                         major = math.sqrt(abs(-B_ / C_))
-                        rot_angle = 90
-                        rot_axis = 0
                         cmds.append(
                             f"create frustum height {h} Major Radius {major} Minor Radius {minor} top 0"
                         )
@@ -429,8 +426,6 @@ def to_cubit_journal(
                         h = inner_world[2] if inner_world else w[2]
                         minor = math.sqrt(abs(-C_ / A_))
                         major = math.sqrt(abs(-C_ / B_))
-                        rot_angle = 180
-                        rot_axis = 0
                         cmds.append(
                             f"create frustum height {h} Major Radius {major} Minor Radius {minor} top 0"
                         )
@@ -540,7 +535,7 @@ def to_cubit_journal(
         if hasattr(node, "region") and not (
             hasattr(node, "fill") and isinstance(node.fill, Lattice)
         ):
-            if node.region != None:
+            if node.region is not None:
                 id = surface_to_cubit_journal(
                     node.region, w, indent, inner_world, hex=hex
                 )
@@ -563,7 +558,6 @@ def to_cubit_journal(
                 # three_d_hex_lattice = len( node.center ) > 2
                 # 3d hex lattice
                 if three_d_hex_lattice:
-                    center = [node.center[0], node.center[1], node.center[1]]
                     ii = 0
                     for uss in node.universes:
                         z = ii * pitch[1]
@@ -685,7 +679,6 @@ def to_cubit_journal(
                         ii = ii + 1
                 # 2d hex lattice
                 else:
-                    center = [node.center[0], node.center[1]]
                     i = 0
                     for us in node.universes:
                         j = 0

@@ -1,12 +1,11 @@
 from abc import ABC, abstractmethod
-import sys
 import math
 import warnings
 
 import numpy as np
 import openmc
 
-from .cubit_util import emit_get_last_id, lastid
+from .cubit_util import emit_get_last_id
 from .geom_util import move, rotate
 
 
@@ -40,7 +39,7 @@ class CADSurface(ABC):
 
     @classmethod
     def from_openmc_surface(cls, surface):
-        with warnings.catch_warnings() as w:
+        with warnings.catch_warnings() as _:
             warnings.simplefilter("ignore")
             return cls.from_openmc_surface_inner(surface)
 
