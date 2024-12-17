@@ -18,11 +18,11 @@ from openmc.surface import Halfspace, Quadric
 from openmc.lattice import Lattice, HexLattice
 
 import openmc_cad_adapter.gqs as gqs
-from openmc_cad_adapter.gqs import CADPlane, CADCylinder, CADSphere
-from openmc_cad_adapter.gqs import CADXPlane, CADYPlane, CADZPlane
-from openmc_cad_adapter.gqs import CADXCylinder, CADYCylinder, CADZCylinder
-from openmc_cad_adapter.gqs import CADXCone, CADYCone, CADZCone
-from openmc_cad_adapter.gqs import CADXTorus, CADYTorus, CADZTorus
+from openmc_cad_adapter.surfaces import CADPlane, CADCylinder, CADSphere
+from openmc_cad_adapter.surfaces import CADXPlane, CADYPlane, CADZPlane
+from openmc_cad_adapter.surfaces import CADXCylinder, CADYCylinder, CADZCylinder
+from openmc_cad_adapter.surfaces import CADXCone, CADYCone, CADZCone
+from openmc_cad_adapter.surfaces import CADXTorus, CADYTorus, CADZTorus
 from .cubit_util import emit_get_last_id, reset_cubit_ids, new_variable
 from .geom_util import move
 
