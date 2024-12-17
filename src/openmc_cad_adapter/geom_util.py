@@ -1,6 +1,7 @@
 import math
 import numpy as np
 
+
 def vector_to_euler_xyz(v):
     v = np.asarray(v)
     v /= np.linalg.norm(v)
@@ -16,8 +17,8 @@ def vector_to_euler_xyz(v):
     phi = np.arctan2(y, x)
 
     # Ensure angles are within [0, 2*pi] range
-    phi %= (2 * math.pi)
-    theta %= (2 * math.pi)
+    phi %= 2 * math.pi
+    theta %= 2 * math.pi
 
     oe = 180 / math.pi
     return phi * oe, theta * oe, 0.0
@@ -37,6 +38,6 @@ def nonzero(*args):
     return any(arg != 0 for arg in args)
 
 
-def move( id, x, y, z, cmds):
-    if nonzero( x, y, z ):
+def move(id, x, y, z, cmds):
+    if nonzero(x, y, z):
         cmds.append(f"body {{ {id} }} move {x} {y} {z}")

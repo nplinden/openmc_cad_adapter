@@ -24,5 +24,5 @@ def emit_get_last_id(type="body", cmds=None):
     if cmds is not None:
         cmds.append(f'#{{ {ids} = Id("{type}") }}')
     else:
-        print('Warning: cmds is None')
+        print("Warning: cmds is None")
     return ids
